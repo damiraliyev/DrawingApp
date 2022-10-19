@@ -10,8 +10,9 @@ import UIKit
 
 
 protocol Drawable {
-    func drawFigure(startPoint: CGPoint, lastPoint: CGPoint)
+    func drawFigure(context: CGContext, startPoint: CGPoint, endPoint: CGPoint)
 }
+
 
 enum Figures {
     case circle
@@ -21,30 +22,71 @@ enum Figures {
     case pen
 }
 
+
+struct Model {
+    var shape: Figures
+    var isNeedToFill: Bool
+    var color: UIColor
+}
+
 class Circle: Drawable {
     
-    func drawFigure(startPoint: CGPoint, lastPoint: CGPoint) {
-//        let radius = sqrt(pow(firstTouchCoordinates.x - lastTouchCoordinates.x, 2) + pow(firstTouchCoordinates.y - lastTouchCoordinates.y, 2)) / 2
-//
-//
-//        context.addArc(center: CGPoint(x: (firstTouchCoordinates.x + lastTouchCoordinates.x) / 2, y:  (firstTouchCoordinates.y + lastTouchCoordinates.y) / 2), radius: radius, startAngle: 0, endAngle:6.28319, clockwise: true)
+    func drawFigure(context:CGContext, startPoint: CGPoint, endPoint: CGPoint) {
+        var startPoint = startPoint
+        var endPoint = endPoint
+        let radius = sqrt(pow(startPoint.x - endPoint.x, 2) + pow(startPoint.y - endPoint.y, 2)) / 2
+
+        let center = CGPoint(x: (startPoint.x + endPoint.x) / 2, y: (startPoint.y + endPoint.y) / 2)
+        context.addArc(center: center, radius: radius, startAngle: 0, endAngle:6.28319, clockwise: true)
+        context.strokePath()
+        startPoint.x = 0
+        startPoint.y = 0
+        endPoint.x = 0
+        endPoint.y = 0
     }
 }
-class Canvas: UIView {
+
+class Rectangle: Drawable {
+    func drawFigure(context: CGContext, startPoint: CGPoint, endPoint: CGPoint) {
+        
+    }
     
+    
+}
+
+class Triangle: Drawable {
+    func drawFigure(context: CGContext, startPoint: CGPoint, endPoint: CGPoint) {
+        var startPoint = startPoint
+        var endPoint = endPoint
+        context.move(to: startPoint)
+        context.addLine(to: endPoint)
+        context.addLines(between: [endPoint, CGPoint(x: endPoint.x, y: startPoint.y)])
+        context.addLines(between: [startPoint, CGPoint(x: endPoint.x, y: startPoint.y)])
+        
+        startPoint.x = 0
+        startPoint.y = 0
+        endPoint.x = 0
+        endPoint.y = 0
+//        UIColor.yellow.setStroke()
+        context.strokePath()
+    }
+    
+    
+}
+
+class Canvas: UIView {
+    var model = Model(shape: .circle, isNeedToFill: false, color: .black)
+    var shape = Figures.triangle
     let circle = Circle()
+    let rectangle = Rectangle()
+    let triangle = Triangle()
     
     var startPoint = CGPoint()
     var endPoint = CGPoint()
     
     var line = [CGPoint]()
     var lines = [[CGPoint]]()
-    var circles = [[UIBezierPath]()]
-    var firstTouchCoordinates = (x: CGFloat(),y: CGFloat())
-    var lastTouchCoordinates = (x: CGFloat(),y: CGFloat())
 
-    
-    var touchEnded = false
     var x = CGFloat()
     var y = CGFloat()
     
@@ -52,6 +94,7 @@ class Canvas: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .white
+//        shape = model.shape
     }
     
     required init?(coder: NSCoder) {
@@ -92,39 +135,54 @@ class Canvas: UIView {
         
         //MARK: How to draw trianglec
         
-        let startCoordinates = CGPoint(x: firstTouchCoordinates.x, y: firstTouchCoordinates.y)
-        let endCoordinates = CGPoint(x: lastTouchCoordinates.x, y: lastTouchCoordinates.y)
-        
-        context.move(to: startCoordinates)
-        context.addLine(to: endCoordinates)
-        //        context.addLine(to: CGPoint(x: endCoordinates.x, y: startCoordinates.y))
-        //        context.addLines(between: [startCoordinates, endCoordinates])
-        //        context.move(to: CGPoint(x: endCoordinates.x, y: startCoordinates.y))
-        //        context.addLine(to: endCoordinates)
-        context.addLines(between: [endCoordinates, CGPoint(x: endCoordinates.x, y: startCoordinates.y)])
-        context.addLines(between: [startCoordinates, CGPoint(x: endCoordinates.x, y: startCoordinates.y)])
+//        context.move(to: startPoint)
+//        context.addLine(to: endPoint)
+//        //        context.addLine(to: CGPoint(x: endCoordinates.x, y: startCoordinates.y))
+//        //        context.addLines(between: [startCoordinates, endCoordinates])
+//        //        context.move(to: CGPoint(x: endCoordinates.x, y: startCoordinates.y))
+//        //        context.addLine(to: endCoordinates)
+//        context.addLines(between: [endPoint, CGPoint(x: endPoint.x, y: startPoint.y)])
+//        context.addLines(between: [startPoint, CGPoint(x: endPoint.x, y: startPoint.y)])
         
         
         //
         
-        context.strokePath()
-        print(firstTouchCoordinates.x, "first x")
-        print(firstTouchCoordinates.y, "first y")
-        print(lastTouchCoordinates.x, "last x")
-        print(lastTouchCoordinates.y, "last x")
-        print("redrawn")
+//        context.strokePath()
         
-        circle.drawFigure(context: context)
+    
+        model.color.setStroke()
+        shape = model.shape
+        print(shape)
+        print(model.shape)
+        if shape == .triangle {
+//            print(shape)
+            triangle.drawFigure(context: context , startPoint: startPoint, endPoint: endPoint)
+        } else if shape == .circle {
+            print("here")
+            circle.drawFigure(context: context , startPoint: startPoint, endPoint: endPoint)
+        } else if shape == .rectangle {
+            rectangle.drawFigure(context: context, startPoint: startPoint, endPoint: endPoint)
+        }
+       
+//        startPoint.x = 0
+//        startPoint.y = 0
+//
+//        endPoint.x = 0
+//        endPoint.y = 0
         
     }
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let firstTouch = touches.first else { return }
         
-        lastTouchCoordinates.x = 0
-        lastTouchCoordinates.y = 0
+        startPoint.x = 0
+        startPoint.y = 0
+
         
-        firstTouchCoordinates.0 = firstTouch.location(in: self).x
-        firstTouchCoordinates.1 = firstTouch.location(in: self).y
+        endPoint.x = 0
+        endPoint.y = 0
+        
+        startPoint.x = firstTouch.location(in: self).x
+        startPoint.y = firstTouch.location(in: self).y
         
         lines.append([CGPoint]())
 //        setNeedsDisplay()
@@ -163,9 +221,11 @@ class Canvas: UIView {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        guard var touch = lines.popLast() else { return }
-        lastTouchCoordinates.x =  x
-        lastTouchCoordinates.y = y
+//        guard var touch = lines.popLast() else { return }
+        
+        endPoint.x = x
+        endPoint.y = y
+       
         
 
         setNeedsDisplay()

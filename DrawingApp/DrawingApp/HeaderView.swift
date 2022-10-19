@@ -17,6 +17,7 @@ class HeaderView: UIView {
     let triangleButton = makeImageButton(image: "triangle")
     let lineButton = makeImageButton(image: "line")
     let penButton = makeImageButton(image: "pen")
+    var shapes = [UIButton]()
     
     let switchStack = makeStack(axis: .horizontal)
     let fillLabel = makeLabel(withText: "Fill")
@@ -24,16 +25,17 @@ class HeaderView: UIView {
     
     let undoButton = makeImageButton(image: "undo")
     
-    
     var colorsStack = makeStack(axis: .horizontal)
-    var orangeColorButton = UIButton()
-    var cyanColorButton = UIButton()
-    var purpleColorButton = UIButton()
-    let pinkColorButton = UIButton()
-    let redColorButton = UIButton()
-    let greenColorButton = UIButton()
-    let yellowColorButton = UIButton()
-    let brownColorButton = UIButton()
+    var orangeColorButton = makeColorButton(color: .orange)
+    var cyanColorButton = makeColorButton(color: .cyan)
+    var purpleColorButton = makeColorButton(color: .purple)
+    let pinkColorButton = makeColorButton(color: .systemPink)
+    let redColorButton = makeColorButton(color: .red)
+    let greenColorButton = makeColorButton(color: .green)
+    let yellowColorButton = makeColorButton(color: .yellow)
+    let brownColorButton = makeColorButton(color: .brown)
+    let blackColorButton = makeColorButton(color: .black)
+    var colors = [UIButton]()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -50,15 +52,11 @@ class HeaderView: UIView {
     
     func setup() {
         colorsStack.spacing = 3
-        orangeColorButton.backgroundColor = .orange
-        cyanColorButton.backgroundColor = .cyan
-        purpleColorButton.backgroundColor = .purple
-        pinkColorButton.backgroundColor = .systemPink
-        redColorButton.backgroundColor = .red
-        greenColorButton.backgroundColor = .green
-        yellowColorButton.backgroundColor = .yellow
-        brownColorButton.backgroundColor = .brown
         
+        shapes = [circleButton, rectangleButton, triangleButton, lineButton, penButton]
+        
+        colors = [orangeColorButton, cyanColorButton, purpleColorButton, pinkColorButton,
+        redColorButton, greenColorButton, yellowColorButton, brownColorButton, blackColorButton]
     }
     
     func layout() {
@@ -82,6 +80,7 @@ class HeaderView: UIView {
         colorsStack.addArrangedSubview(greenColorButton)
         colorsStack.addArrangedSubview(yellowColorButton)
         colorsStack.addArrangedSubview(brownColorButton)
+        colorsStack.addArrangedSubview(blackColorButton)
         
         addSubview(undoButton)
         
@@ -128,13 +127,23 @@ func makeImageButton(image: String) -> UIButton {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.setImage(UIImage(named: image), for: .normal)
-    
+    button.setTitle(image, for: .normal)
+    button.titleLabel?.isHidden = true
     button.heightAnchor.constraint(equalToConstant: 45).isActive = true
     button.widthAnchor.constraint(equalToConstant: 45).isActive = true
     
     return button
 }
 
+func makeColorButton(color: UIColor) -> UIButton{
+    let button = UIButton()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.backgroundColor = color
+//    button.setTitle(color.name, for: .normal)
+
+    
+    return button
+}
 
 func makeLabel(withText text: String) -> UILabel {
     let label = UILabel()
@@ -143,4 +152,29 @@ func makeLabel(withText text: String) -> UILabel {
     label.font = UIFont.systemFont(ofSize: 16)
     
     return label
+}
+
+
+
+extension UIColor {
+    var name: String? {
+        switch self {
+        case UIColor.black: return "black"
+        case UIColor.darkGray: return "darkGray"
+        case UIColor.lightGray: return "lightGray"
+        case UIColor.white: return "white"
+        case UIColor.gray: return "gray"
+        case UIColor.red: return "red"
+        case UIColor.green: return "green"
+        case UIColor.blue: return "blue"
+        case UIColor.cyan: return "cyan"
+        case UIColor.yellow: return "yellow"
+        case UIColor.magenta: return "magenta"
+        case UIColor.orange: return "orange"
+        case UIColor.purple: return "purple"
+        case UIColor.brown: return "brown"
+        case UIColor.systemPink: return "pink"
+        default: return nil
+        }
+    }
 }

@@ -7,111 +7,15 @@
 
 import UIKit
 
-//class Circle {
-//    
-//    func drawFigure(context: CGContext) {
-////        guard let context = UIGraphicsGetCurrentContext() else {return}
-//                
-//        context.setFillColor(CGColor.init(red: 255, green: 128, blue: 123, alpha: 1))
-//        context.move(to: CGPoint(x: 100, y: 100))
-//        context.addLine(to: CGPoint(x: 200, y: 200))
-//        
-//        context.strokePath()
-//        
-//    }
-//}
 
-//class Canvas: UIView {
-//
-//    let circle = Circle()
-//
-//    var line = [CGPoint]()
-//    var lines = [[CGPoint]]()
-//    var circles = [[UIBezierPath]()]
-//    var firstTouchCoordinates = (x: CGFloat(),y: CGFloat())
-//    var lastTouchCoordinates = (x: CGFloat(),y: CGFloat())
-//    var touchEnded = false
-//    var x = CGFloat()
-//    var y = CGFloat()
-//
-//
-//    override init(frame: CGRect) {
-//        super.init(frame: frame)
-//        backgroundColor = .white
-//    }
-//
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
-//    override func draw(_ rect: CGRect) {
-//        super.draw(rect)
-//
-//
-//
-//        guard let context = UIGraphicsGetCurrentContext() else { return }
-////        print(lines)
-////        for line in lines {
-////            for point in line {
-////
-////                    if line.firstIndex(of: point) == 0 {
-////                        context.move(to: point)
-////                    } else {
-////                        context.addLine(to: point)
-////                    }
-////
-////
-////            }
-////
-////        }
-//
-////        var textPoint = CGPoint(x: 100, y: 100)
-////        var textAnotherPoint = CGPoint(x: 150, y: 150)
-//
-//
-//        //MARK: How to draw circle
-//
-////        let radius = sqrt(pow(firstTouchCoordinates.x - lastTouchCoordinates.x, 2) + pow(firstTouchCoordinates.y - lastTouchCoordinates.y, 2)) / 2
-////
-////
-////        context.addArc(center: CGPoint(x: (firstTouchCoordinates.x + lastTouchCoordinates.x) / 2, y:  (firstTouchCoordinates.y + lastTouchCoordinates.y) / 2), radius: radius, startAngle: 0, endAngle:6.28319, clockwise: true)
-//
-//        //MARK: How to draw rectangle
-//
-//        let startCoordinates = CGPoint(x: firstTouchCoordinates.x, y: firstTouchCoordinates.y)
-//        let endCoordinates = CGPoint(x: lastTouchCoordinates.x, y: lastTouchCoordinates.y)
-//
-//        context.move(to: startCoordinates)
-//        context.addLine(to: endCoordinates)
-////        context.addLine(to: CGPoint(x: endCoordinates.x, y: startCoordinates.y))
-////        context.addLines(between: [startCoordinates, endCoordinates])
-////        context.move(to: CGPoint(x: endCoordinates.x, y: startCoordinates.y))
-////        context.addLine(to: endCoordinates)
-//        context.addLines(between: [endCoordinates, CGPoint(x: endCoordinates.x, y: startCoordinates.y)])
-//        context.addLines(between: [startCoordinates, CGPoint(x: endCoordinates.x, y: startCoordinates.y)])
-//
-//
-////
-//
-//        context.strokePath()
-//        print(firstTouchCoordinates.x, "first x")
-//        print(firstTouchCoordinates.y, "first y")
-//        print(lastTouchCoordinates.x, "last x")
-//        print(lastTouchCoordinates.y, "last x")
-//        print("redrawn")
-//
-//        circle.drawFigure(context: context)
-//
-//    }
-//
-
-//}
 
 class ViewController: UIViewController {
+    let drawingVC = DrawingViewController()
+    var model = Model(shape: .pen, isNeedToFill: false, color: .black)
     
     override func viewWillLayoutSubviews() {
-        canvas.frame = view.frame
+        
     }
-    let canvas = Canvas()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -121,11 +25,70 @@ class ViewController: UIViewController {
     }
     
     func setup() {
-        view.addSubview(canvas)
-        canvas.backgroundColor = .white
-        canvas.frame = view.frame
+        addChild(drawingVC)
+        drawingVC.view.frame = view.frame
+        view.addSubview(drawingVC.view)
+        drawingVC.didMove(toParent: self)
+        
+//        drawingVC.headerView.circleButton.addTarget(self, action: #selector(changeColor), for: .primaryActionTriggered)
+        
+        for colorButton in drawingVC.headerView.colors {
+            colorButton.addTarget(self, action: #selector(changeColor), for: .primaryActionTriggered)
+        }
+        
+        for shapeButton in drawingVC.headerView.shapes {
+            shapeButton.addTarget(self, action: #selector(changeShape), for: .primaryActionTriggered)
+        }
+        
+//        view.addSubview(canvas)
+//        drawingVC.canvas.backgroundColor = .white
+//        drawincanvas.frame = view.frame
     }
-
+    
+    @objc func changeShape(_ sender: UIButton) {
+        let shapes = drawingVC.headerView.shapes
+//        var currentShape = drawingVC.canvas.model.shape
+//        shapes = [circleButton, rectangleButton, triangleButton, lineButton, penButton]
+        if shapes.firstIndex(of: sender) == 0 {
+            print("circle")
+            drawingVC.canvas.model.shape = .circle
+        } else if shapes.firstIndex(of: sender) == 1 {
+            drawingVC.canvas.model.shape = .rectangle
+        } else if shapes.firstIndex(of: sender) == 2 {
+            print("Triangle")
+            drawingVC.canvas.model.shape = .triangle
+        } else if shapes.firstIndex(of: sender) == 3 {
+            drawingVC.canvas.model.shape = .line
+        } else if shapes.firstIndex(of: sender) == 4 {
+            drawingVC.canvas.model.shape = .pen
+        }
+    }
+    
+    @objc func changeColor(_ sender: UIButton) {
+        print("pressed")
+        let colors = drawingVC.headerView.colors
+        if colors.firstIndex(of: sender) == 0 {
+            drawingVC.canvas.model.color = .orange
+        } else if colors.firstIndex(of: sender) == 1 {
+            drawingVC.canvas.model.color = .cyan
+        } else if colors.firstIndex(of: sender) == 2 {
+            drawingVC.canvas.model.color = .purple
+        } else if colors.firstIndex(of: sender) == 3 {
+            drawingVC.canvas.model.color = .systemPink
+        } else if colors.firstIndex(of: sender) == 4 {
+            drawingVC.canvas.model.color = .red
+        } else if colors.firstIndex(of: sender) == 5 {
+            drawingVC.canvas.model.color = .green
+        } else if colors.firstIndex(of: sender) == 6 {
+            drawingVC.canvas.model.color = .yellow
+        } else if colors.firstIndex(of: sender) == 7 {
+            drawingVC.canvas.model.color = .brown
+        } else if colors.firstIndex(of: sender) == 8 {
+            drawingVC.canvas.model.color = .black
+        }
+        
+        print(model.color.name)
+    }
 
 }
 

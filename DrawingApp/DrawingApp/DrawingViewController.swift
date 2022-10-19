@@ -22,11 +22,8 @@ class DrawingViewController: UIViewController {
     
     func setup() {
         
-        canvas.backgroundColor = .magenta
+        canvas.backgroundColor = .systemFill
         canvas.translatesAutoresizingMaskIntoConstraints = false
-//        canvas.frame = view.frame
-//        canvas.frame = view.frame
-//        canvas.frame.height = view.frame.height - headerView.frame.height
         headerView.translatesAutoresizingMaskIntoConstraints = false
     }
     
@@ -38,7 +35,6 @@ class DrawingViewController: UIViewController {
             headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             headerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8),
             headerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -8)
-//            headerView.heightAnchor.constraint(equalToConstant: 50)
         ])
         
         NSLayoutConstraint.activate([
