@@ -12,6 +12,7 @@ import UIKit
 class ViewController: UIViewController {
     let drawingVC = DrawingViewController()
     var model = Model(shape: .pen, isNeedToFill: false, color: .black)
+    let undoIsPressing = false
     
     override func viewWillLayoutSubviews() {
         
@@ -29,9 +30,7 @@ class ViewController: UIViewController {
         drawingVC.view.frame = view.frame
         view.addSubview(drawingVC.view)
         drawingVC.didMove(toParent: self)
-        
-//        drawingVC.headerView.circleButton.addTarget(self, action: #selector(changeColor), for: .primaryActionTriggered)
-        
+
         for colorButton in drawingVC.headerView.colors {
             colorButton.addTarget(self, action: #selector(changeColor), for: .primaryActionTriggered)
         }
@@ -40,15 +39,13 @@ class ViewController: UIViewController {
             shapeButton.addTarget(self, action: #selector(changeShape), for: .primaryActionTriggered)
         }
         
-//        view.addSubview(canvas)
-//        drawingVC.canvas.backgroundColor = .white
-//        drawincanvas.frame = view.frame
+        drawingVC.headerView.isFill.addTarget(self, action: #selector(fillSwitchToggled), for: .primaryActionTriggered)
+        
+        drawingVC.headerView.undoButton.addTarget(self, action: #selector(undoPressed), for: .primaryActionTriggered)
     }
     
     @objc func changeShape(_ sender: UIButton) {
         let shapes = drawingVC.headerView.shapes
-//        var currentShape = drawingVC.canvas.model.shape
-//        shapes = [circleButton, rectangleButton, triangleButton, lineButton, penButton]
         if shapes.firstIndex(of: sender) == 0 {
             print("circle")
             drawingVC.canvas.model.shape = .circle
@@ -86,8 +83,18 @@ class ViewController: UIViewController {
         } else if colors.firstIndex(of: sender) == 8 {
             drawingVC.canvas.model.color = .black
         }
-        
-        print(model.color.name)
+
+    }
+    
+    @objc func fillSwitchToggled(_ sender: UIButton) {
+        print(drawingVC.headerView.isFill.isOn)
+        drawingVC.canvas.model.isNeedToFill = drawingVC.headerView.isFill.isOn
+    }
+    
+    @objc func undoPressed(_ sender: UIButton) {
+        let previousFigure = drawingVC.canvas.figures.popLast()
+        drawingVC.canvas.undoIsPressing = true
+        drawingVC.canvas.setNeedsDisplay()
     }
 
 }
