@@ -99,7 +99,7 @@ class ViewController: UIViewController {
     }
     
     @objc func shortUndoPressed(_ sender: UIButton) {
-        if drawingVC.canvas.figures.count - 1 != 0{
+        if drawingVC.canvas.figures.count != 0{
             let previousFigure = drawingVC.canvas.figures.popLast()
             drawingVC.canvas.undoIsPressing = true
             drawingVC.canvas.setNeedsDisplay()

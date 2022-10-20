@@ -42,7 +42,7 @@ class Circle: Drawable {
         }
        
         path.stroke()
-
+        print(path)
         return path
     }
 }
@@ -136,11 +136,11 @@ class Canvas: UIView {
     var x = CGFloat()
     var y = CGFloat()
     
+    var filledArray = [UIColor]()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .white
-//        shape = model.shape
     }
     
     required init?(coder: NSCoder) {
@@ -156,7 +156,11 @@ class Canvas: UIView {
         if model.isNeedToFill == true {
             print("FFIIILLLL")
             context.setFillColor(model.color.cgColor)
+//            filledArray.append(model.color)
+        } else {
+//            filledArray.append(UIColor.systemFill)
         }
+        filledArray.append(model.color)
         model.color.setStroke()
 
         guard let shape = model.shape else { print("deletedr");setNeedsDisplay(); return }
@@ -167,8 +171,6 @@ class Canvas: UIView {
                 
             } else if shape == .circle {
                 figures.append(circle.drawFigure(context: context , startPoint: startPoint, endPoint: endPoint, isNeedToFill: model.isNeedToFill))
-
-                
             } else if shape == .rectangle {
                 figures.append(rectangle.drawFigure(context: context, startPoint: startPoint, endPoint: endPoint, isNeedToFill: model.isNeedToFill))
             } else if shape == .line {
@@ -184,19 +186,34 @@ class Canvas: UIView {
                     path.stroke()
                 }
                 figures.append(path)
+//                filledArray.append(model.color)
+                
             }
         }
         
         var needToChange = false
-        for figure in figures {
-            if figures.firstIndex(of: figure) == figures.count - 1 {
-                needToChange = true
+//        for figure in figures {
+//            if figures.firstIndex(of: figure) == figures.count - 1 {
+//                needToChange = true
+//            }
+//            figure.stroke()
+//        }
+        if figures.count != 0{
+            for i in 0...figures.count - 1 {
+                if i == figures.count - 1 {
+                    needToChange = true
+                }
+                print(filledArray[i])
+                filledArray[i].setStroke()
+//                figures[i].fill()
+//                filledArray[i].setFill()
+                figures[i].stroke()
             }
-            figure.stroke()
+            if needToChange {
+                undoIsPressing = false
+            }
         }
-        if needToChange {
-            undoIsPressing = false
-        }
+        
         
         if figures.count == 0 {
             undoIsPressing = false
