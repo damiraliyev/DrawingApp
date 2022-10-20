@@ -22,7 +22,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         setup()
-        
+        addTapGestures()
     }
     
     func setup() {
@@ -41,7 +41,14 @@ class ViewController: UIViewController {
         
         drawingVC.headerView.isFill.addTarget(self, action: #selector(fillSwitchToggled), for: .primaryActionTriggered)
         
-        drawingVC.headerView.undoButton.addTarget(self, action: #selector(undoPressed), for: .primaryActionTriggered)
+        drawingVC.headerView.undoButton.addTarget(self, action: #selector(shortUndoPressed), for: .primaryActionTriggered)
+    }
+    
+    func addTapGestures() {
+        let shortPress = UITapGestureRecognizer(target: self, action: #selector(shortUndoPressed(_:)))
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longUndoPressed))
+        drawingVC.headerView.undoButton.addGestureRecognizer(shortPress)
+        drawingVC.headerView.undoButton.addGestureRecognizer(longPress)
     }
     
     @objc func changeShape(_ sender: UIButton) {
@@ -91,10 +98,20 @@ class ViewController: UIViewController {
         drawingVC.canvas.model.isNeedToFill = drawingVC.headerView.isFill.isOn
     }
     
-    @objc func undoPressed(_ sender: UIButton) {
-        let previousFigure = drawingVC.canvas.figures.popLast()
+    @objc func shortUndoPressed(_ sender: UIButton) {
+        if drawingVC.canvas.figures.count - 1 != 0{
+            let previousFigure = drawingVC.canvas.figures.popLast()
+            drawingVC.canvas.undoIsPressing = true
+            drawingVC.canvas.setNeedsDisplay()
+        }
+    }
+    
+    @objc func longUndoPressed(_ sender: UIButton) {
         drawingVC.canvas.undoIsPressing = true
+        drawingVC.canvas.figures.removeAll()
+        print( drawingVC.canvas.figures.count)
         drawingVC.canvas.setNeedsDisplay()
+        print( drawingVC.canvas.figures.count)
     }
 
 }

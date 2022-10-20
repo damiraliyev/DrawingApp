@@ -32,12 +32,9 @@ struct Model {
 class Circle: Drawable {
     
     func drawFigure(context:CGContext, startPoint: CGPoint, endPoint: CGPoint, isNeedToFill: Bool) -> UIBezierPath {
-        let radius = sqrt(pow(startPoint.x - endPoint.x, 2) + pow(startPoint.y - endPoint.y, 2)) / 2
-//
-        let center = CGPoint(x: (startPoint.x + endPoint.x) / 2, y: (startPoint.y + endPoint.y) / 2)
-//        context.addArc(center: center, radius: radius, startAngle: 0, endAngle:6.28319, clockwise: true)
-//        context.strokePath()
         
+        let radius = sqrt(pow(startPoint.x - endPoint.x, 2) + pow(startPoint.y - endPoint.y, 2)) / 2
+        let center = CGPoint(x: (startPoint.x + endPoint.x) / 2, y: (startPoint.y + endPoint.y) / 2)
         let path = UIBezierPath()
         path.addArc(withCenter: center, radius: radius, startAngle: 0, endAngle: 6.28319, clockwise: true)
         if isNeedToFill == true {
@@ -45,14 +42,27 @@ class Circle: Drawable {
         }
        
         path.stroke()
-        
+
         return path
     }
 }
 
 class Rectangle: Drawable {
     func drawFigure(context: CGContext, startPoint: CGPoint, endPoint: CGPoint, isNeedToFill: Bool) -> UIBezierPath {
-        return UIBezierPath()
+        let path = UIBezierPath()
+        path.move(to: startPoint)
+        path.addLine(to: CGPoint(x: endPoint.x, y: startPoint.y))
+        path.addLine(to: endPoint)
+        path.addLine(to: CGPoint(x: startPoint.x, y: endPoint.y))
+        path.addLine(to: startPoint)
+        
+        if isNeedToFill == true {
+            path.fill()
+        }
+       
+        path.stroke()
+
+        return path
     }
     
     
@@ -71,6 +81,20 @@ class Line: Drawable {
         
         return path
     }
+}
+
+class Pen: Drawable {
+    func drawFigure(context: CGContext, startPoint: CGPoint, endPoint: CGPoint, isNeedToFill: Bool) -> UIBezierPath {
+        let path = UIBezierPath()
+        path.move(to: startPoint)
+        path.addLine(to: endPoint)
+//        UIColor.yellow.setStroke()
+        path.stroke()
+        
+        return path
+    }
+    
+    
 }
 
 class Triangle: Drawable {
@@ -101,11 +125,12 @@ class Canvas: UIView {
     let rectangle = Rectangle()
     let triangle = Triangle()
     let line = Line()
-    
+    let pen = Pen()
     var shapes = [Drawable]()
     var startPoint = CGPoint()
     var endPoint = CGPoint()
     
+    var penLine = [CGPoint]()
     var figures = [UIBezierPath]()
     var undoIsPressing = false
     var x = CGFloat()
@@ -133,27 +158,32 @@ class Canvas: UIView {
             context.setFillColor(model.color.cgColor)
         }
         model.color.setStroke()
-//        let shape = model.shape
-        print(shape)
-        print(model.shape)
-        
-       
 
         guard let shape = model.shape else { print("deletedr");setNeedsDisplay(); return }
         if undoIsPressing == false {
             if shape == .triangle {
-    //            print(shape)
                 figures.append(triangle.drawFigure(context: context , startPoint: startPoint, endPoint: endPoint, isNeedToFill: model.isNeedToFill))
                 shapes.append(triangle)
                 
             } else if shape == .circle {
-                print("here")
                 figures.append(circle.drawFigure(context: context , startPoint: startPoint, endPoint: endPoint, isNeedToFill: model.isNeedToFill))
+
+                
             } else if shape == .rectangle {
                 figures.append(rectangle.drawFigure(context: context, startPoint: startPoint, endPoint: endPoint, isNeedToFill: model.isNeedToFill))
             } else if shape == .line {
                 figures.append(line.drawFigure(context: context, startPoint: startPoint, endPoint: endPoint, isNeedToFill: model.isNeedToFill))
-                
+            } else if shape == .pen {
+                let path = UIBezierPath()
+                for (i,p) in penLine.enumerated() {
+                    if i == 0 {
+                        path.move(to: p)
+                    } else {
+                        path.addLine(to: p)
+                    }
+                    path.stroke()
+                }
+                figures.append(path)
             }
         }
         
@@ -165,6 +195,10 @@ class Canvas: UIView {
             figure.stroke()
         }
         if needToChange {
+            undoIsPressing = false
+        }
+        
+        if figures.count == 0 {
             undoIsPressing = false
         }
         
@@ -187,37 +221,29 @@ class Canvas: UIView {
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else{ return }
-        
-//        firstTouchCoordinates.x = touch.location(in: self).x
-//        firstTouchCoordinates.y = touch.location(in: self).y
-        
-//        guard var lastLine = lines.popLast() else { return }
-        
+
+        print(penLine, "penLine")
+        if model.shape == .pen {
+            penLine.append(touch.location(in: self))
+            setNeedsDisplay()
+        }
+
        
         x = touch.location(in: self).x
         y = touch.location(in: self).y
         
         print(x)
         print(y)
-       
-//        circles.append(circle)
-        
-//        lastLine.append(touch.location(in: self))
-//        lines.append(lastLine)
 
-        
-//        setNeedsDisplay()
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-//        guard var touch = lines.popLast() else { return }
         
         endPoint.x = x
         endPoint.y = y
-       
         
-
+        penLine.removeAll()
         setNeedsDisplay()
     }
     
