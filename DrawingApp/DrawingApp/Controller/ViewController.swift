@@ -75,6 +75,7 @@ class ViewController: UIViewController {
             drawingVC.canvas.model.color = .orange
         } else if colors.firstIndex(of: sender) == 1 {
             drawingVC.canvas.model.color = .cyan
+            print("here")
         } else if colors.firstIndex(of: sender) == 2 {
             drawingVC.canvas.model.color = .purple
         } else if colors.firstIndex(of: sender) == 3 {
@@ -100,7 +101,7 @@ class ViewController: UIViewController {
     
     @objc func shortUndoPressed(_ sender: UIButton) {
         if drawingVC.canvas.figures.count != 0{
-            let previousFigure = drawingVC.canvas.figures.popLast()
+            let _ = drawingVC.canvas.figures.popLast()
             drawingVC.canvas.undoIsPressing = true
             drawingVC.canvas.setNeedsDisplay()
         }
@@ -109,6 +110,9 @@ class ViewController: UIViewController {
     @objc func longUndoPressed(_ sender: UIButton) {
         drawingVC.canvas.undoIsPressing = true
         drawingVC.canvas.figures.removeAll()
+        drawingVC.canvas.filledFigures.removeAll()
+        drawingVC.canvas.strokesArray.removeAll()
+        drawingVC.canvas.model.color.setStroke()
         print( drawingVC.canvas.figures.count)
         drawingVC.canvas.setNeedsDisplay()
         print( drawingVC.canvas.figures.count)

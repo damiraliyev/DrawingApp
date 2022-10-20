@@ -119,8 +119,8 @@ class Triangle: Drawable {
 }
 
 class Canvas: UIView {
-    var model = Model(shape: .circle, isNeedToFill: false, color: .black)
-    var shape = Figures.triangle
+    var model = Model(shape: .pen, isNeedToFill: false, color: .black)
+    var shape = Figures.pen
     let circle = Circle()
     let rectangle = Rectangle()
     let triangle = Triangle()
@@ -130,13 +130,15 @@ class Canvas: UIView {
     var startPoint = CGPoint()
     var endPoint = CGPoint()
     
+    var filledFigures = Dictionary<Int, UIColor>()
+    
     var penLine = [CGPoint]()
     var figures = [UIBezierPath]()
     var undoIsPressing = false
     var x = CGFloat()
     var y = CGFloat()
     
-    var filledArray = [UIColor]()
+    var strokesArray = [UIColor]()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -153,28 +155,26 @@ class Canvas: UIView {
         
         guard let context = UIGraphicsGetCurrentContext() else { return }
        
-        if model.isNeedToFill == true {
-            print("FFIIILLLL")
-            context.setFillColor(model.color.cgColor)
-//            filledArray.append(model.color)
-        } else {
-//            filledArray.append(UIColor.systemFill)
-        }
-        filledArray.append(model.color)
+       
         model.color.setStroke()
 
         guard let shape = model.shape else { print("deletedr");setNeedsDisplay(); return }
         if undoIsPressing == false {
             if shape == .triangle {
+                
                 figures.append(triangle.drawFigure(context: context , startPoint: startPoint, endPoint: endPoint, isNeedToFill: model.isNeedToFill))
                 shapes.append(triangle)
+                saveIfFilled()
                 
             } else if shape == .circle {
                 figures.append(circle.drawFigure(context: context , startPoint: startPoint, endPoint: endPoint, isNeedToFill: model.isNeedToFill))
+                saveIfFilled()
             } else if shape == .rectangle {
                 figures.append(rectangle.drawFigure(context: context, startPoint: startPoint, endPoint: endPoint, isNeedToFill: model.isNeedToFill))
+                saveIfFilled()
             } else if shape == .line {
                 figures.append(line.drawFigure(context: context, startPoint: startPoint, endPoint: endPoint, isNeedToFill: model.isNeedToFill))
+                saveIfFilled()
             } else if shape == .pen {
                 let path = UIBezierPath()
                 for (i,p) in penLine.enumerated() {
@@ -186,10 +186,13 @@ class Canvas: UIView {
                     path.stroke()
                 }
                 figures.append(path)
+                saveIfFilled()
 //                filledArray.append(model.color)
                 
             }
         }
+        strokesArray.append(model.color)
+        
         
         var needToChange = false
 //        for figure in figures {
@@ -198,21 +201,28 @@ class Canvas: UIView {
 //            }
 //            figure.stroke()
 //        }
+        
         if figures.count != 0{
             for i in 0...figures.count - 1 {
                 if i == figures.count - 1 {
                     needToChange = true
                 }
-                print(filledArray[i])
-                filledArray[i].setStroke()
-//                figures[i].fill()
-//                filledArray[i].setFill()
+                
+                if filledFigures[i] != nil {
+                    filledFigures[i]?.setFill()
+                    figures[i].fill()
+                }
+   
+                strokesArray[i].setStroke()
+
                 figures[i].stroke()
             }
             if needToChange {
                 undoIsPressing = false
             }
         }
+        
+        
         
         
         if figures.count == 0 {
@@ -234,6 +244,11 @@ class Canvas: UIView {
         startPoint.y = firstTouch.location(in: self).y
     }
     
+    func saveIfFilled() {
+        if model.isNeedToFill == true {
+            filledFigures[figures.count - 1] = model.color
+        }
+    }
    
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {

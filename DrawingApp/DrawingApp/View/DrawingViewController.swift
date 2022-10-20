@@ -22,7 +22,7 @@ class DrawingViewController: UIViewController {
     
     func setup() {
         
-        canvas.backgroundColor = .systemFill
+        canvas.backgroundColor = .systemGray3
         canvas.translatesAutoresizingMaskIntoConstraints = false
         headerView.translatesAutoresizingMaskIntoConstraints = false
     }
