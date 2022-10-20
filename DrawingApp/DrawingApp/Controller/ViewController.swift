@@ -100,8 +100,13 @@ class ViewController: UIViewController {
     }
     
     @objc func shortUndoPressed(_ sender: UIButton) {
+        
         if drawingVC.canvas.figures.count != 0{
             let _ = drawingVC.canvas.figures.popLast()
+            print(drawingVC.canvas.strokesArray.count)
+            drawingVC.canvas.strokesArray.removeLast()
+            print(drawingVC.canvas.strokesArray.count)
+            drawingVC.canvas.model.color = drawingVC.canvas.strokesArray.last!
             drawingVC.canvas.undoIsPressing = true
             drawingVC.canvas.setNeedsDisplay()
         }
@@ -112,10 +117,8 @@ class ViewController: UIViewController {
         drawingVC.canvas.figures.removeAll()
         drawingVC.canvas.filledFigures.removeAll()
         drawingVC.canvas.strokesArray.removeAll()
-        drawingVC.canvas.model.color.setStroke()
-        print( drawingVC.canvas.figures.count)
         drawingVC.canvas.setNeedsDisplay()
-        print( drawingVC.canvas.figures.count)
+        drawingVC.canvas.model.color.setStroke()
     }
 
 }

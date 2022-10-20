@@ -156,8 +156,8 @@ class Canvas: UIView {
         guard let context = UIGraphicsGetCurrentContext() else { return }
        
        
-        model.color.setStroke()
-
+        
+        
         guard let shape = model.shape else { print("deletedr");setNeedsDisplay(); return }
         if undoIsPressing == false {
             if shape == .triangle {
@@ -187,21 +187,16 @@ class Canvas: UIView {
                 }
                 figures.append(path)
                 saveIfFilled()
-//                filledArray.append(model.color)
-                
             }
+            strokesArray.append(model.color)
+
+            model.color.setStroke()
         }
-        strokesArray.append(model.color)
         
+        
+                
         
         var needToChange = false
-//        for figure in figures {
-//            if figures.firstIndex(of: figure) == figures.count - 1 {
-//                needToChange = true
-//            }
-//            figure.stroke()
-//        }
-        
         if figures.count != 0{
             for i in 0...figures.count - 1 {
                 if i == figures.count - 1 {
