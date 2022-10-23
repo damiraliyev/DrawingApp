@@ -42,7 +42,6 @@ class Circle: Drawable {
         }
        
         path.stroke()
-        print(path)
         return path
     }
 }
@@ -77,7 +76,6 @@ class Line: Drawable {
             path.fill()
         }
         path.stroke()
-        context.strokePath()
         
         return path
     }
@@ -110,7 +108,6 @@ class Triangle: Drawable {
             path.fill()
         }
         path.stroke()
-        context.strokePath()
         
         return path
     }
@@ -151,17 +148,11 @@ class Canvas: UIView {
     override func draw(_ rect: CGRect) {
         super.draw(rect)
         
-        
-        
         guard let context = UIGraphicsGetCurrentContext() else { return }
        
-       
-        
-        
         guard let shape = model.shape else { print("deletedr");setNeedsDisplay(); return }
         if undoIsPressing == false {
             if shape == .triangle {
-                
                 figures.append(triangle.drawFigure(context: context , startPoint: startPoint, endPoint: endPoint, isNeedToFill: model.isNeedToFill))
                 shapes.append(triangle)
                 saveIfFilled()
