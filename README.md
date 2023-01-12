@@ -6,24 +6,25 @@ This app was made for iPads
 ### With this application you can draw:
 
 
-Various things with a pen
+- Various things with a pen
 
-Circles
+- Circles
 
-Rectangles
+- Rectangles
 
-Triangles
+- Triangles
 
-Straight lines
+- Straight lines
 
 #### Also:
 You can change colors for drawing.
 
-You can choose "Fill" to have your shapes fully colored.
+- You can choose "Fill" to have your shapes fully colored.
 
-You can click on the "Undo" button to undo your last changes.
+- You can click on the "Undo" button to undo your last changes.
 
-If you hold down "Undo" for a while, you will completely delete all drawings
+- If you hold down "Undo" for a while, you will completely delete all drawings
+
 
 
 
