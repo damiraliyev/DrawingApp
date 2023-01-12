@@ -45,13 +45,38 @@ class ViewController: UIViewController {
     }
     
     func addTapGestures() {
-        let shortPress = UITapGestureRecognizer(target: self, action: #selector(shortUndoPressed(_:)))
+        let shortPress = UITapGestureRecognizer(target: self, action: #selector(shortUndoPressed))
+        shortPress.addTarget(self, action: #selector(handleTap))
+        
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longUndoPressed))
+        longPress.addTarget(self, action: #selector(handleLongPress))
         drawingVC.headerView.undoButton.addGestureRecognizer(shortPress)
         drawingVC.headerView.undoButton.addGestureRecognizer(longPress)
     }
     
+    @objc func handleTap(_ sender: UITapGestureRecognizer) {
+        
+        sender.view?.alpha = 0.5
+        
+        UIView.animate(withDuration: 0.2, delay: 0) {
+            sender.view?.alpha = 1
+        }
+    }
+    
+    @objc func handleLongPress(_ sender: UILongPressGestureRecognizer) {
+        
+        sender.view?.alpha = 0.3
+        
+        UIView.animate(withDuration: 1, delay: 0) {
+            sender.view?.alpha = 1
+        }
+       
+    }
+    
     @objc func changeShape(_ sender: UIButton) {
+        
+        sender.animatePress()
+        
         let shapes = drawingVC.headerView.shapes
         if shapes.firstIndex(of: sender) == 0 {
             print("circle")
@@ -69,13 +94,14 @@ class ViewController: UIViewController {
     }
     
     @objc func changeColor(_ sender: UIButton) {
-        print("pressed")
+        
+        sender.animatePress()
+        
         let colors = drawingVC.headerView.colors
         if colors.firstIndex(of: sender) == 0 {
             drawingVC.canvas.model.color = .orange
         } else if colors.firstIndex(of: sender) == 1 {
             drawingVC.canvas.model.color = .cyan
-            print("here")
         } else if colors.firstIndex(of: sender) == 2 {
             drawingVC.canvas.model.color = .purple
         } else if colors.firstIndex(of: sender) == 3 {
@@ -116,7 +142,6 @@ class ViewController: UIViewController {
     }
     
     @objc func longUndoPressed(_ sender: UIButton) {
-        
         drawingVC.canvas.undoIsPressing = true
         drawingVC.canvas.figures.removeAll()
         drawingVC.canvas.filledFigures.removeAll()
@@ -127,3 +152,14 @@ class ViewController: UIViewController {
 
 }
 
+
+
+extension UIButton {
+    func animatePress() {
+        alpha = 0.3
+        
+        UIView.animate(withDuration: 0.5, delay: 0) { [weak self] in
+            self?.alpha = 1
+        }
+    }
+}
