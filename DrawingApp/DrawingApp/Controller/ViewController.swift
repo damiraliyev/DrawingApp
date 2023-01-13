@@ -8,7 +8,6 @@
 import UIKit
 
 
-
 class ViewController: UIViewController {
     let drawingVC = DrawingViewController()
     var model = Model(shape: .pen, isNeedToFill: false, color: .black)
